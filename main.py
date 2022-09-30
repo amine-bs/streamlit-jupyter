@@ -2,7 +2,7 @@ import torch
 from utils import *
 
 device = load_device()
-model = load_model(device=device)
+model = import_model(bucket="mbenxsalha", key="diffusion/state_dict.pickle", device=device)
 
 st.title("Welcome to The Ship Detective!")
 st.write("The image you upload will be fed to a Deep Neural Network in real-time to verify if there is a ship or not")

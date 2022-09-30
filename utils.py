@@ -4,16 +4,22 @@ import torch
 import torch.nn.functional as F
 import torchvision.transforms.functional as TF
 import streamlit as st
+import boto3
+import pickle
 
 IMG_EXTENSIONS = [
     '.jpg', '.JPG', '.jpeg', '.JPEG',
     '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP']
 
 @st.cache()
-def load_model(device, path="model/model.pth"):
-    model = ResNet(pretrained = False)
-    model = model.to(device)
-    #model.load_state_dict(torch.load(path, map_location=device))
+def import_model(bucket, key="diffusion/state_dict.pickle", device=torch.device('cpu')):
+    s3 = boto3.client('s3',endpoint_url='https://minio.lab.sspcloud.fr/')
+    data = s3.get_object(Bucket=bucket, Key=key)
+    state_dict = pickle.loads(data['Body'].read())
+    model = ResNet()
+    model.load_state_dict(state_dict)
+    model.to(device)
+    model.eval()
     return model
 
 def load_image(file):
